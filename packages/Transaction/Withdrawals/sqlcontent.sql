@@ -26,7 +26,8 @@ FROM (SELECT	t1.transid		AS id,
 	FROM splittransactions_v1 AS t2
 		INNER JOIN checkingaccount_v1 AS t1	ON t1.TRANSID = t2.TRANSID
 	WHERE  
-	t1.transcode = "Withdrawal"
+	t1.transcode = "Withdrawal"  and coalesce(t1.DELETEDTIME, '') = ''
+        and t1.transdate >= '&begin_date'  and t1.transdate  <= '&end_date'
 UNION ALL
 SELECT	ca.transid	AS id,
 	ca.transdate		AS date,
@@ -37,7 +38,8 @@ SELECT	ca.transid	AS id,
 	ca.accountid		AS accountid
 	FROM  checkingaccount_v1 AS ca
 	WHERE  
-		ca.transcode = "Withdrawal" AND ca.categid <>-1
+		ca.transcode = "Withdrawal" AND ca.categid <>-1 AND coalesce(ca.DELETEDTIME, '') = ''
+                and ca.transdate >= '&begin_date'  and ca.transdate  <= '&end_date'
 ) AS wd_data
 LEFT JOIN accountlist_v1 AS acc ON wd_data.accountid = acc.accountid
 LEFT JOIN CURRENCYFORMATS_V1 AS c ON c.CURRENCYID = acc.CURRENCYID
